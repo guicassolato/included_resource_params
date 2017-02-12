@@ -40,7 +40,7 @@ class IncludedResourceParams
   #
   # @return [Boolean] whether this instance has included resources
   def has_included_resources?
-    !self.included_resources.nil?
+    !self.included_resources.empty?
   end
 
   ##
@@ -56,7 +56,7 @@ class IncludedResourceParams
   # @return [Array] an Array of Strings parsed from the include param with
   # wildcard includes removed
   def included_resources
-    # TODO: implement me
+    @include_param ? @include_param.split(",") : Array.new
   end
 
   ##
