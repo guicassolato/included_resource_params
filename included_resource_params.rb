@@ -56,7 +56,7 @@ class IncludedResourceParams
   # @return [Array] an Array of Strings parsed from the include param with
   # wildcard includes removed
   def included_resources
-    @include_param ? @include_param.split(",") : Array.new
+    @include_param ? @include_param.split(",").reject{ |r| r.include?("*") } : Array.new
   end
 
   ##
