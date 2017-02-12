@@ -40,7 +40,7 @@ class IncludedResourceParams
   #
   # @return [Boolean] whether this instance has included resources
   def has_included_resources?
-    # TODO: implement me
+    !self.included_resources.nil?
   end
 
   ##
