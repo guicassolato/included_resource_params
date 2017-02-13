@@ -76,7 +76,29 @@ class IncludedResourceParams
   # @return [Array] an Array of Symbols and/or Hashes compatible with ActiveRecord
   # `includes`
   def model_includes
-    # TODO: implement me
+    # 1st level convertion -- allows same-level repetition of attributes
+    build_deep = lambda { |arr| arr.collect { |res| res.include?(".") ? { res.split(".").shift.to_sym => build_deep.call([res.split(".").drop(1).join(".")]) } : res.to_sym } }
+    a1 = build_deep.call(included_resources).uniq
+    
+    # merges the repetitions into single structures -- it may add some "{ key: nil }" hashes to represent simple attributes of the includes clause
+    hashify = lambda { |arr|
+      h = {}
+      arr.each{ |res|
+        h.merge!(res.is_a?(Hash) ? res : { res => nil }) { |key, res1, res2|
+          res1.is_a?(Array) ? (res2.is_a?(Array) ? hashify.call(res1 + res2) : res1) : (res2.is_a?(Array) ? res2 : nil)
+        }
+      }
+      h
+    }
+    a2 = hashify.call(a1)
+    
+    # simplifies "{ key: nil }" hashes back to ":key" symbols 
+    simplify = lambda { |hsh|
+      r = []
+      hsh.each{ |key, val| r << ( val.nil? ? key : { key => simplify.call(val) } ) }
+      r
+    }
+    a3 = simplify.call(a2)
   end
 end
 
